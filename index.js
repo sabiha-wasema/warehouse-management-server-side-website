@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+// const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
@@ -10,6 +11,10 @@ app.use(cors());
 app.use(express.json());
 
 
+
+
+
+
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.8v7rf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
@@ -17,6 +22,16 @@ async function run() {
     try {
         await client.connect();
         const productCollection = client.db('gaucheFruitCenter').collection('product');
+
+        // AUTH
+        app.post('/login', async (req, res) => {
+            const user = req.body;
+            const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+                expiresIn: '1d'
+            });
+            res.send({ accessToken });
+        })
+
 
         app.get('/product', async (req, res) => {
             const query = {};
@@ -46,6 +61,9 @@ async function run() {
             const result = await productCollection.deleteOne(query);
             res.send(result);
         });
+        // Order Collection API
+
+
     }
     finally {
 
