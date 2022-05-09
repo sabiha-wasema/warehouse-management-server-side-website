@@ -109,6 +109,11 @@ run().catch(console.dir);
 app.get('/', (req, res) => {
     res.send('Running Gauche Server');
 })
+
+app.get('/hero', (req, res) => {
+    res.send('Heroku server active')
+})
+
 app.listen(port, () => {
     console.log('Listening', port);
 })
