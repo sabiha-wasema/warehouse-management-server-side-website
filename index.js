@@ -75,7 +75,7 @@ async function run() {
             const result = await productCollection.deleteOne(query);
             res.send(result);
         });
-        // Order Collection API
+
         app.get('/order', verifyJWT, async (req, res) => {
             const decodedEmail = req.decoded.email;
             const email = req.query.email;
