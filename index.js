@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-// const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
@@ -22,6 +22,7 @@ async function run() {
     try {
         await client.connect();
         const productCollection = client.db('gaucheFruitCenter').collection('product');
+        const orderCollection = client.db('gaucheFruitCenter').collection('order');
 
         // AUTH
         app.post('/login', async (req, res) => {
@@ -62,6 +63,25 @@ async function run() {
             res.send(result);
         });
         // Order Collection API
+        app.get('/order', verifyJWT, async (req, res) => {
+            const decodedEmail = req.decoded.email;
+            const email = req.query.email;
+            if (email === decodedEmail) {
+                const query = { email: email };
+                const cursor = orderCollection.find(query);
+                const orders = await cursor.toArray();
+                res.send(orders);
+            }
+            else {
+                res.status(403).send({ message: 'forbidden access' })
+            }
+        })
+
+        app.post('/order', async (req, res) => {
+            const order = req.body;
+            const result = await orderCollection.insertOne(order);
+            res.send(result);
+        })
 
 
     }
